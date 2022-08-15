@@ -14,7 +14,7 @@ Parameters:
 
 Resources:
 
-###VPC###
+#####################VPC#####################
   VPC:
     Type: AWS::EC2::VPC
     Properties:
@@ -26,7 +26,7 @@ Resources:
         - Key: Name
           Value: Task1_VPC
 
-###IGW###
+#####################IGW#####################
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
@@ -39,3 +39,19 @@ Resources:
     Properties:
       InternetGatewayId: !Ref InternetGateway
       VpcId: !Ref VPC
+
+##################NATGateway##################
+  NatGatewayEIP:
+    Type: AWS::EC2::EIP
+    DependsOn: VPCtoIGWConnection
+    Properties:
+      Domain: vpc
+
+  NatGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGatewayEIP.AllocationId
+      SubnetId: !Ref PublicSubnetAz0
+      Tags:
+        - Key: Name
+          Value: Task1_NATGW
