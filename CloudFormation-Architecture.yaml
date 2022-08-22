@@ -55,7 +55,7 @@ Resources:
       Tags:
         - Key: Name
           Value: Task1_NATGW
-###Subnets###
+#####################Subnets#####################
   PublicSubnetAz0:
     Type: AWS::EC2::Subnet
     Properties:
@@ -110,7 +110,7 @@ Resources:
         - Key: Name
           Value: Private Subnet (AZ2)
 
-###PublicRouteTable###
+#####################PublicRouteTable#####################
   RouteTablePublic:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -145,7 +145,7 @@ Resources:
       SubnetId:  
         Ref: PublicSubnetAz1
 
-###PrivateRouteTable###
+#####################PrivateRouteTable#####################
   RouteTablePrivate:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -174,3 +174,34 @@ Resources:
       RouteTableId: !Ref RouteTablePrivate
       SubnetId:
         Ref: PrivateSubnetAz1
+
+#####################SecurityGroups#####################
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: grants secure access to the base2 nginx instances through the load balancer
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0 
+      Tags: 
+        - Key: Name
+          Value: Task1-LoadBalancer SG
+
+  NginxSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: grants secure access to the base2 nginx instances from ALB
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
