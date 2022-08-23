@@ -205,3 +205,29 @@ Resources:
         FromPort: 80
         ToPort: 80
         SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
+
+#####################NetworkACL#####################
+  NetworkAclPrivate:
+    Type: AWS::EC2::NetworkAcl
+    Properties:
+      VpcId:
+        Ref: VPC
+      Tags:
+        - Key: Name
+          Value: Task1-NACL      
+
+  ACLAssociationSubnetPersistence1:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      SubnetId:
+        Ref: PrivateSubnetAz0
+      NetworkAclId:
+        Ref: NetworkAclPrivate
+  
+  ACLAssociationSubnetPersistence2:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      SubnetId:
+        Ref: PrivateSubnetAz1
+      NetworkAclId:
+        Ref: NetworkAclPrivate
