@@ -55,6 +55,7 @@ Resources:
       Tags:
         - Key: Name
           Value: Task1_NATGW
+
 #####################Subnets#####################
   PublicSubnetAz0:
     Type: AWS::EC2::Subnet
@@ -302,3 +303,26 @@ Resources:
           Fn::GetAtt:
           - NginxLaunchTemplate
           - LatestVersionNumber
+
+#####################IAM-Role#####################
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: ec2.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: eni-attach
+        PolicyDocument:
+          Statement:
+          - Sid: fulladmin
+            Action: "*"
+            Resource:
+            - "*"
+            Effect: Allow
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
