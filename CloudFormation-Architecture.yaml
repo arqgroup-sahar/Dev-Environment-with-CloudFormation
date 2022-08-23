@@ -231,3 +231,54 @@ Resources:
         Ref: PrivateSubnetAz1
       NetworkAclId:
         Ref: NetworkAclPrivate
+
+#####################LoadBalancer#####################
+  ApplicationLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    DependsOn: 
+      - VPC
+      - InternetGateway
+      - VPCtoIGWConnection
+    Properties:
+      Name: Task1ApplicationLoadBalancer
+      Subnets: 
+        - !Ref PublicSubnetAz0
+        - !Ref PublicSubnetAz1
+      SecurityGroups: 
+        - !Ref LoadBalancerSecurityGroup
+      Tags: 
+        - Key: Name
+          Value: Task1-ALB
+          
+  HTTPListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn: 
+      - VPC
+      - InternetGateway
+      - VPCtoIGWConnection
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref Task1TargetGroup
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+  Task1TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      Matcher: 
+        HttpCode: 200,302
+      Name: NginxTargetGroup
+      Port: 80
+      Protocol: HTTP
+      UnhealthyThresholdCount: 5
+      TargetType: instance
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: Task1-TargetGroup
