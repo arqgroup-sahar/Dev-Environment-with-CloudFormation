@@ -373,9 +373,9 @@ Resources:
 
                   <body>
 
-                    <title>Base2 Training</title>
+                    <title>Welcome to my Web Page</title>
 
-                    <h1>Welcome to Base2!</h1>
+                    <h1>This is a Dev environment created with ClouldFormation in AWS!</h1>
 
                   </body>
 
@@ -412,4 +412,3 @@ Resources:
               nginx:
                 enabled: true
                 ensureRunning: true
-
