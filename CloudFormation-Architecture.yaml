@@ -326,3 +326,90 @@ Resources:
             Effect: Allow
       ManagedPolicyArns:
       - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+#####################EC2#####################
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+      - Ref: InstanceRole
+
+  NginxLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        ImageId: !Ref AmazonLinux2Ami
+        InstanceType: 't3.micro'
+        UserData:
+          Fn::Base64:
+            Fn::Sub: |
+
+              #!/bin/bash
+
+              /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource NginxLaunchTemplate --region ${AWS::Region}
+
+        IamInstanceProfile:
+          Name: !Ref InstanceProfile
+        SecurityGroupIds:
+          - !Ref NginxSecurityGroup
+    Metadata:
+      AWS::CloudFormation::Init:
+        configSets:
+          default:
+          - setup
+          - start
+        setup:
+          commands:
+            install_nginx:
+              command: "amazon-linux-extras install -y nginx1"
+          files:
+            "/var/www/html/index.html":
+              mode: '000644'
+              owner: root
+              group: root
+              content: |
+
+                <html>
+
+                  <body>
+
+                    <title>Base2 Training</title>
+
+                    <h1>Welcome to Base2!</h1>
+
+                  </body>
+
+                </html>
+
+            "/etc/nginx/conf.d/training.conf":
+
+              mode: '000644'
+              owner: root
+              group: root
+              content: |
+
+                server {
+
+                    listen 8081 default_server;
+
+                    
+
+                    root /var/www/html/;
+
+
+
+                    location / {
+
+                    }
+
+
+
+                }
+
+        start:
+          services:
+            sysvinit:
+              nginx:
+                enabled: true
+                ensureRunning: true
+
