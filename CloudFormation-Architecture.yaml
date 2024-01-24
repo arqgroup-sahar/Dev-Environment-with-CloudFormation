@@ -412,3 +412,9 @@ Resources:
               nginx:
                 enabled: true
                 ensureRunning: true
+
+Outputs:
+  ApplicationLoadBalancerDNSName:
+    Description: The DNSName of the Application Load Balancer
+    Value: !GetAtt BackupLoadBalancer.DNSName
+    Condition: CreateProdResources                
